@@ -4,15 +4,15 @@ aside.sidebar
    img( :src="logo", alt="Logo")
   nav
     ul
-      li  <router-link class="link" to="/"> <el-icon style="font-size: 24px" ><OfficeBuilding /></el-icon> Analytics</router-link> 
-      li  <router-link class="link" to="/users"> <el-icon style="font-size: 24px"  ><User /></el-icon> Users</router-link>
-      li  <router-link class="link" to="/products"> <el-icon style="font-size: 24px" ><Menu /></el-icon> Products</router-link>
+      li  <div class="link" to="#"> <el-icon style="font-size: 24px" ><OfficeBuilding /></el-icon> Analytics</div> 
+      li  <router-link class="link" to="/dashboard/users"> <el-icon style="font-size: 24px"  ><User /></el-icon> Users</router-link>
+      li  <router-link class="link" to="/dashboard/products"> <el-icon style="font-size: 24px" ><Menu /></el-icon> Products</router-link>
 
     
     
 </template>
 
-<script setup lang="ts">
+<script setup>
 import logo from "../assets/images/logo.png";
 </script>
 
@@ -41,6 +41,6 @@ li {
 }
 
 .router-link-active {
-  background-color: $text-bg;
+  background-color: #f0f0f0;
 }
 </style>

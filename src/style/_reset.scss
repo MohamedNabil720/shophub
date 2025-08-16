@@ -1,0 +1,20 @@
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+
+// Reset margins for all Element Plus components
+[class^="el-"],
+[class*=" el-"] {
+  margin: 0 !important;
+}
+
+// Remove list styles
+ul {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}

@@ -16,7 +16,7 @@ import Sidebar from "../components/Sidebar.vue";
 <style scoped>
 .main-layout {
   display: flex;
-  height: 100vh;
+  height: calc(100vh - 86px);
 }
 
 .main-container {

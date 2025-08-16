@@ -1,16 +1,21 @@
 <template lang="pug">
- 
- div(class="main-container")
-  MainLayout
-
+div(class="main-container")
+  router-view
 </template>
 
 <script setup>
-import MainLayout from "./layout/MainLayout.vue";
+import { onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/useAuthStore";
+
+const router = useRouter();
+const authStore = useAuthStore();
+
+onMounted(() => {
+  if (authStore.isLoggedIn) {
+    router.push("/dashboard");
+  }
+});
 </script>
 
-<style lang="scss" scoped>
-.main-container {
-  font-family: $font-primary, sans-serif;
-}
-</style>
+<style lang="scss" scoped></style>
