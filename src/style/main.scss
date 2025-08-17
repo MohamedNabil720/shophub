@@ -4,3 +4,13 @@
 body {
   font-family: $font-primary, sans-serif;
 }
+
+.el-step__head.is-finish {
+  color: #0dff00 !important;
+  .el-step__icon.is-text {
+    background-color: #0dff00;
+    .el-step__icon-inner {
+      color: #fff;
+    }
+  }
+}
