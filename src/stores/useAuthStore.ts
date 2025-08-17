@@ -1,8 +1,11 @@
+// src/stores/useAuthStore.ts
 import { defineStore } from "pinia";
+import Cookies from "js-cookie";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
-    token: localStorage.getItem("token") || "",
+    token: Cookies.get("token") || "",
+    errorMessage: null as string | null, // ✨ لتخزين الرسالة
   }),
 
   getters: {
@@ -12,14 +15,16 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     login(token: string, user: any) {
       this.token = token;
-
-      localStorage.setItem("token", token);
+      Cookies.set("token", token, { expires: 5, secure: true });
     },
 
     logout() {
       this.token = "";
+      Cookies.remove("token");
+    },
 
-      localStorage.removeItem("token");
+    setError(message: string | null) {
+      this.errorMessage = message;
     },
   },
 });

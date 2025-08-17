@@ -28,19 +28,20 @@ main.login-container
       el-form-item
         el-button.login-btn(type="primary" native-type="submit" :loading="isLoading" :disabled="isLoading") Login
 
-
-
-      .error-message(v-if="loginError") {{ loginError }}
+      .error-message(v-if="authStore.errorMessage") {{ authStore.errorMessage }}
 </template>
 
 <script setup lang="ts">
 import logo from "@/assets/images/logo.png";
 import axios from "axios";
 import { useForm, useField } from "vee-validate";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import * as yup from "yup";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useRouter } from "vue-router";
+
+const authStore = useAuthStore();
+const router = useRouter();
 
 const validationSchema = yup.object({
   email: yup
@@ -53,18 +54,14 @@ const validationSchema = yup.object({
     .min(6, "Password must be at least 6 characters"),
 });
 
-const { handleSubmit, errors, meta } = useForm({
+const { handleSubmit, errors } = useForm({
   validationSchema,
 });
 
 const { value: email } = useField("email");
 const { value: password } = useField("password");
 
-const loginError = ref("");
 const isLoading = ref(false);
-
-const router = useRouter();
-const authStore = useAuthStore();
 
 const onSubmit = handleSubmit(async (formValues) => {
   isLoading.value = true;
@@ -78,12 +75,12 @@ const onSubmit = handleSubmit(async (formValues) => {
     );
 
     authStore.login(response.data.access_token, { email: formValues.email });
+    authStore.setError(null);
 
-    loginError.value = "";
     router.push("/dashboard");
   } catch (error) {
-    console.error(" Login failed:", error);
-    loginError.value = "Invalid email or password";
+    console.error("Login failed:", error);
+    authStore.setError("Invalid email or password");
   } finally {
     isLoading.value = false;
   }

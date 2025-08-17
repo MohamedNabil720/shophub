@@ -10,7 +10,7 @@ div.page-wrapper
 
     template(v-if="currentStep === 1")
       h3.form-title Product information
-      Form(:validation-schema="step1Schema" @submit="goToStep2" v-slot="{ errors, setFieldValue }")
+      Form( :key="formKey" :validation-schema="step1Schema" :initial-values="form" @submit="goToStep2" v-slot="{ errors, setFieldValue }")
         Field(name="thumbnail" type="hidden")
 
         div.form-body
@@ -37,7 +37,7 @@ div.page-wrapper
                 Field(name="title" v-slot="{ field }")
                   el-input(:model-value="field.value" @update:model-value="field.onChange" placeholder="e.g. valuable, premium television")
 
-              el-form-item(label="Slug")
+              el-form-item(label="Slug" , :error="errors.slug")
                 Field(name="slug" v-slot="{ field }")
                   el-input(:model-value="field.value" @update:model-value="field.onChange" placeholder="Enter slug")
 
@@ -59,7 +59,7 @@ div.page-wrapper
 
     template(v-else-if="currentStep === 2")
       h3.form-title Product Pricing
-      Form(:validation-schema="step2Schema" @submit="createProduct" v-slot="{ errors }")
+      Form(:validation-schema="step2Schema" :initial-values="form" @submit="submitProduct" v-slot="{ errors }")
         el-form(label-position="top" label-width="120px")
           el-form-item(label="Pricing plan")
             Field(name="plan" v-slot="{ field }")
@@ -84,7 +84,7 @@ div.page-wrapper
 
         div.form-actions
           el-button(type="default" @click="currentStep = 1") Back
-          el-button(type="primary" native-type="submit") Create
+          el-button(type="primary" native-type="submit") {{ props.mode === 'create' ? 'Create' : 'Update' }}
 
     // ---------------- Step 3 ----------------
     
@@ -94,16 +94,23 @@ div.page-wrapper
         h2.success-title You are caught up
         p.success-message Product has been created successfully
         p.success-message Press "Done" to return back to your dashboard
-        el-button(type="primary" @click="goToDashboard") Done
+        div.done-btn
+          el-button(type="primary" @click="goToDashboard") Done
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import axios from "axios";
 import { Form, Field } from "vee-validate";
 import * as yup from "yup";
 import doneImage from "@/assets/images/done.png";
 import router from "@/router";
+
+interface Props {
+  mode: "create" | "update";
+  id?: string;
+}
+const props = defineProps<Props>();
 
 const currentStep = ref(1);
 const previewImage = ref<string | null>(null);
@@ -120,22 +127,23 @@ const form = ref({
   sellingPrice: "",
 });
 
-const categories = [
-  { label: "Clothes", value: 1 },
-  { label: "Electronics", value: 2 },
-  { label: "Kids", value: 3 },
-  { label: "Others", value: 4 },
-];
+// const categories = [
+//   { label: "Clothes", value: 1 },
+//   { label: "Electronics", value: 2 },
+//   { label: "Kids", value: 3 },
+//   { label: "Others", value: 4 },
+// ];
 
 // Schema Step 1
 const step1Schema = yup.object({
   title: yup.string().required("Title is required"),
+  slug: yup.string().required("Slug is required"),
   description: yup.string().required("Description is required"),
   category: yup
-    .number()
+    .string()
     .typeError("Category is required")
     .required("Category is required"),
-  thumbnail: yup.string().required("Thumbnail is required"),
+  thumbnail: yup.string().required("Img is required"),
 });
 
 // Schema Step 2
@@ -178,28 +186,84 @@ async function uploadThumbnail(e: Event, setFieldValue: any) {
   }
 }
 
-async function createProduct(values: any) {
+const formKey = ref(0);
+
+const categories = ref<{ label: string; value: number }[]>([]);
+
+// ---------------- Load product if update ----------------
+onMounted(async () => {
+  try {
+    // ✅ هات الكاتيجوريز من الـ API
+    const { data } = await axios.get(
+      "https://api.escuelajs.co/api/v1/categories"
+    );
+    categories.value = data.map((cat: any) => ({
+      label: cat.name,
+      value: cat.id,
+    }));
+  } catch (err) {
+    console.error("❌ Error loading categories:", err);
+  }
+
+  if (props.mode === "update" && props.id) {
+    try {
+      const { data } = await axios.get(
+        `https://api.escuelajs.co/api/v1/products/${props.id}`
+      );
+
+      form.value = {
+        title: data.title,
+        slug: data.title.toLowerCase().replace(/\s+/g, "-"),
+        category: data.category?.name,
+        description: data.description,
+        thumbnail: data.images[0],
+        plan: "Paid",
+        productPrice: data.price,
+        sellingPrice: data.price,
+      };
+      console.log(data.category);
+
+      previewImage.value = data.images[0];
+
+      // force re-render of <Form>
+      formKey.value++;
+    } catch (err) {
+      console.error("❌ Error loading product:", err);
+    }
+  }
+});
+
+// ---------------- Create / Update product ----------------
+async function submitProduct(values: any) {
   form.value = { ...form.value, ...values };
 
-  try {
-    const payload = {
-      title: form.value.title,
-      price: Number(form.value.productPrice),
-      description: form.value.description,
-      categoryId: Number(form.value.category),
-      images: [form.value.thumbnail],
-      plan: form.value.plan,
-      sellingPrice: form.value.sellingPrice,
-    };
+  const payload = {
+    title: form.value.title,
+    price: Number(form.value.productPrice),
+    description: form.value.description,
+    categoryId: Number(form.value.category),
+    images: [form.value.thumbnail],
+    plan: form.value.plan,
+    sellingPrice: form.value.sellingPrice,
+  };
 
-    const { data } = await axios.post(
-      "https://api.escuelajs.co/api/v1/products/",
-      payload
-    );
-    console.log(" Product Created:", data);
+  try {
+    if (props.mode === "create") {
+      const { data } = await axios.post(
+        "https://api.escuelajs.co/api/v1/products/",
+        payload
+      );
+      console.log("✅ Product Created:", data);
+    } else if (props.mode === "update" && props.id) {
+      const { data } = await axios.put(
+        `https://api.escuelajs.co/api/v1/products/${props.id}`,
+        payload
+      );
+      console.log("✅ Product Updated:", data);
+    }
     currentStep.value = 3;
   } catch (err: any) {
-    console.error(" Error:", err.response?.data || err.message);
+    console.error("❌ Error:", err.response?.data || err.message);
   }
 }
 
@@ -298,12 +362,16 @@ function goToDashboard() {
     .fields-section {
       flex: 1;
     }
+    .error {
+      color: red;
+    }
   }
 
   .form-actions {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+    margin-top: 40px;
   }
 
   .price-fields {
@@ -317,13 +385,19 @@ function goToDashboard() {
   color: #00ff00;
 
   .success-title {
-    font-size: 24px;
+    font-size: 40px;
     font-weight: bold;
   }
 
   .success-message {
     font-size: 14px;
     margin: 5px 0;
+  }
+
+  .done-btn {
+    margin-top: 150px !important;
+    width: 100%;
+    text-align: end;
   }
 }
 </style>

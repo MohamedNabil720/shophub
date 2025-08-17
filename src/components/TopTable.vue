@@ -2,21 +2,42 @@
   div.top-table
    div.my-content
     div
-     h3 Users
+     h3 {{ lastSegment }}
 
      div.right-icon
       <el-icon><HomeFilled /></el-icon> <el-icon><ArrowRight /></el-icon>
-      span Users
+      span {{ lastSegment }}
     div
-     <el-button size="large" class="add-user-btn" type="info"> <el-icon class="icon-space"><Plus /> </el-icon>   Add user
+     <el-button size="large" @click="handleAdd" class="add-user-btn" type="info"> 
+       <el-icon class="icon-space"><Plus />  </el-icon> Add  {{ lastSegment.slice(0, -1) }}  
      </el-button>
  
    Search
-
 </template>
 
 <script setup lang="ts">
+import { useRoute, useRouter } from "vue-router";
+import { computed } from "vue";
 import Search from "./Search.vue";
+
+const route = useRoute();
+
+const router = useRouter();
+
+const lastSegment = computed(() => {
+  const segments = route.path.split("/");
+  return segments[segments.length - 1];
+});
+
+const handleAdd = () => {
+  if (lastSegment.value === "products") {
+    router.push("/products/create");
+  } else if (lastSegment.value === "users") {
+    router.push("/dashboard/users");
+  } else {
+    console.log("No route defined for:", lastSegment.value);
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -41,6 +62,8 @@ import Search from "./Search.vue";
 .right-icon {
   font-size: 12px;
   margin-top: 3px;
+  display: flex;
+  align-items: center;
   span {
     color: #0000004f;
   }
