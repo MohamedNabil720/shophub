@@ -10,9 +10,11 @@ div.search-container
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { storeToRefs } from "pinia";
+import { useSearchStore } from "@/stores/useSearchStore";
 
-const searchText = ref("");
+const searchStore = useSearchStore();
+const { searchText } = storeToRefs(searchStore);
 </script>
 
 <style scoped lang="scss">

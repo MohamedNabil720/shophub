@@ -15,11 +15,11 @@ div.table-container
       template(#default="{ row }")
         span {{ truncateWords(row.slug, 3) }}
 
-    el-table-column(label="Description" min-width="230")
+    el-table-column(label="Description" min-width="220")
       template(#default="{ row }")
         span {{ truncateWords(row.description, 5) }}
 
-    el-table-column(label="Category" width="120")
+    el-table-column(label="Category" width="140")
       template(#default="{ row }")
         span {{ row.category?.name || 'N/A' }}
 
@@ -87,8 +87,10 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import TopTable from "@/components/TopTable.vue";
+import { useSearchStore } from "@/stores/useSearchStore";
 
 const router = useRouter();
+const searchStore = useSearchStore();
 
 interface Product {
   id: number;
@@ -114,8 +116,19 @@ const endIndex = computed(() => {
   const end = startIndex.value + pageSize.value;
   return end > total.value ? total.value : end;
 });
+
+const filteredProducts = computed(() => {
+  const search = searchStore.searchText.toLowerCase();
+  return products.value.filter(
+    (u) =>
+      u.title.toLowerCase().includes(search) ||
+      u.category?.name.toLowerCase().includes(search) ||
+      u.price.toString().includes(search)
+  );
+});
+
 const paginatedProducts = computed(() => {
-  return products.value.slice(startIndex.value, endIndex.value);
+  return filteredProducts.value.slice(startIndex.value, endIndex.value);
 });
 
 const truncateWords = (text: string, wordLimit: number) => {
@@ -200,8 +213,9 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .table-container {
-  margin-right: $margin-right-large;
-  margin-left: $margin-left-small;
+  padding-right: $margin-right-large;
+  padding-left: $margin-left-small;
+  overflow-x: auto;
 
   :deep(.is-leaf) {
     font-weight: bold;

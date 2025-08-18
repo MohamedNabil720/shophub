@@ -20,6 +20,8 @@ import Sidebar from "../components/Sidebar.vue";
 }
 
 .main-container {
-  width: 100%;
+  flex: 1;
+  width: auto;
+  overflow-x: hidden;
 }
 </style>

@@ -28,11 +28,14 @@ div.table-container
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import TopTable from "@/components/TopTable.vue";
+import { useSearchStore } from "@/stores/useSearchStore";
 
 const users = ref<any[]>([]);
 const total = ref(0);
 const pageSize = ref(7);
 const currentPage = ref(1);
+
+const searchStore = useSearchStore();
 
 const startIndex = computed(() => (currentPage.value - 1) * pageSize.value);
 const endIndex = computed(() => {
@@ -40,8 +43,18 @@ const endIndex = computed(() => {
   return end > total.value ? total.value : end;
 });
 
+const filteredUsers = computed(() => {
+  const search = searchStore.searchText.toLowerCase();
+  return users.value.filter(
+    (u) =>
+      u.name.toLowerCase().includes(search) ||
+      u.email.toLowerCase().includes(search) ||
+      u.role.toLowerCase().includes(search)
+  );
+});
+
 const paginatedUsers = computed(() => {
-  return users.value.slice(startIndex.value, endIndex.value);
+  return filteredUsers.value.slice(startIndex.value, endIndex.value);
 });
 
 onMounted(async () => {
@@ -58,8 +71,9 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .table-container {
-  margin-right: $margin-right-large;
-  margin-left: $margin-left-small;
+  padding-right: $margin-right-large;
+  padding-left: $margin-left-small;
+  overflow-x: auto;
 
   :deep(.is-leaf) {
     font-weight: bold;

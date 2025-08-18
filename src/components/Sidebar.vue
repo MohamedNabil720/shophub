@@ -18,7 +18,7 @@ import logo from "../assets/images/logo.png";
 
 <style lang="scss" scoped>
 .sidebar {
-  width: 240px;
+  min-width: 240px;
   background: #fff;
   border-right: 1px solid #eee;
   padding: 20px;

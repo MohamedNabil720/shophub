@@ -42,8 +42,8 @@ const handleAdd = () => {
 
 <style lang="scss" scoped>
 .top-table {
-  margin-right: $margin-right-large;
-  margin-left: $margin-left-small;
+  padding-right: $margin-right-large;
+  padding-left: $margin-left-small;
   margin-top: 50px;
 }
 
