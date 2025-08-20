@@ -37,7 +37,7 @@ import { useProductForm } from "@/composables/useProductForm";
 import ProductFormStep1 from "@/components/productForm/ProductFormStep1.vue";
 import ProductFormStep2 from "@/components/productForm/ProductFormStep2.vue";
 import ProductFormStep3 from "@/components/productForm/ProductFormStep3.vue";
-import type { ProductProps } from "@/types/product";
+import type { ProductProps } from "@/types/create";
 
 const props = defineProps<ProductProps>();
 

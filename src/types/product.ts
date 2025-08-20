@@ -1,31 +1,28 @@
-// types/product.ts
-export interface ProductForm {
+export interface Category {
+  id: number;
+  name: string;
+}
+
+export interface Product {
+  id: number;
   title: string;
   slug: string;
-  category: string;
   description: string;
-  thumbnail: string;
-  plan: string;
-  productPrice: string;
-  sellingPrice: string;
-}
-
-export interface Category {
-  label: string;
-  value: number;
-}
-
-export interface ProductProps {
-  mode: "create" | "update";
-  id?: string;
-}
-
-export interface ProductPayload {
-  title: string;
   price: number;
-  description: string;
-  categoryId: number;
-  images: string[];
-  plan: string;
-  sellingPrice: string;
+  creationAt: string;
+  updatedAt: string;
+  category?: Category;
+}
+
+export interface ProductPaginationInfo {
+  total: number;
+  pageSize: number;
+  currentPage: number;
+  startIndex: number;
+  endIndex: number;
+}
+
+export interface DeleteDialogState {
+  isVisible: boolean;
+  productToDelete: Product | null;
 }

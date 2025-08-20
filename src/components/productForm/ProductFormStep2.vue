@@ -32,7 +32,7 @@ div
 <script setup lang="ts">
 import { Form, Field } from "vee-validate";
 import { step2Schema } from "@/schemas/validation";
-import type { ProductForm } from "@/types/product";
+import type { ProductForm } from "@/types/create";
 
 interface Props {
   form: ProductForm;

@@ -1,12 +1,12 @@
 import { ref, onMounted } from "vue";
-import { ProductService } from "@/services/productService";
+import { ProductService } from "@/services/createService";
 import { UploadService } from "@/services/uploadService";
 import type {
   ProductForm,
   Category,
   ProductProps,
   ProductPayload,
-} from "@/types/product";
+} from "@/types/create";
 import router from "@/router";
 
 export function useProductForm(props: ProductProps) {

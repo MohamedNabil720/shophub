@@ -82,7 +82,7 @@ div
 <script setup lang="ts">
 import { Form, Field } from "vee-validate";
 import { step1Schema } from "@/schemas/validation";
-import type { ProductForm, Category } from "@/types/product";
+import type { ProductForm, Category } from "@/types/create";
 
 interface Props {
   formKey: number;
